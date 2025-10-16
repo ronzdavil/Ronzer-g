@@ -2,234 +2,86 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>Ronzer G2 – Chat</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:"Inter",sans-serif;
-  background:#f7f7f8;
-  color:#111;
-  height:100vh;
-  display:flex;
-  overflow:hidden;
-}
-
+body{font-family:"Inter",sans-serif;background:#f7f7f8;color:#111;height:100vh;display:flex;overflow:hidden;}
 /* ===== Sidebar ===== */
-.sidebar{
-  width:260px;
-  background:#fff;
-  border-right:1px solid #e3e3e3;
-  display:flex;
-  flex-direction:column;
-  transition:width .3s ease;
-}
-.sidebar-header{
-  padding:16px;
-  font-weight:600;
-  color:#0078ff;
-  border-bottom:1px solid #eee;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-.sidebar-header button{
-  border:none;background:none;cursor:pointer;font-size:1.2em;color:#555;
-}
-.history-list{
-  flex:1;
-  overflow-y:auto;
-  padding:10px;
-}
-.history-item{
-  background:#f9f9f9;
-  border:1px solid #eee;
-  border-radius:8px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  cursor:pointer;
-  transition:background .2s;
-}
+.sidebar{width:260px;background:#fff;border-right:1px solid #e3e3e3;display:flex;flex-direction:column;transition:transform .3s ease;}
+.sidebar-header{padding:16px;font-weight:600;color:#0078ff;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}
+.sidebar-header button{border:none;background:none;cursor:pointer;font-size:1.2em;color:#555;}
+.history-list{flex:1;overflow-y:auto;padding:10px;}
+.history-item{background:#f9f9f9;border:1px solid #eee;border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s;}
 .history-item:hover{background:#f0f0f0;}
-.new-chat{
-  margin:10px;
-  padding:10px;
-  background:#0078ff;
-  color:#fff;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:500;
-}
+.history-title{flex:1;}
+.del-btn{border:none;background:none;color:#999;font-size:1em;cursor:pointer;margin-left:8px;}
+.del-btn:hover{color:#d33;}
+.new-chat{margin:10px;padding:10px;background:#0078ff;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:500;}
 .new-chat:hover{background:#005fcc;}
-
-/* ===== Main Chat Area ===== */
-.main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-}
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 20px;
-  border-bottom:1px solid #e3e3e3;
-  background:#fafafa;
-  font-weight:600;
-  color:#222;
-}
-header .btns{
-  display:flex;
-  gap:10px;
-}
-header button{
-  border:none;
-  background:#f0f0f0;
-  color:#333;
-  padding:6px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:0.9em;
-  transition:0.2s;
-}
+/* ===== Main Chat ===== */
+.main{flex:1;display:flex;flex-direction:column;}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;border-bottom:1px solid #e3e3e3;background:#fafafa;font-weight:600;color:#222;}
+header .btns{display:flex;gap:10px;}
+header button{border:none;background:#f0f0f0;color:#333;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:.9em;transition:.2s;}
 header button:hover{background:#e2e2e2;}
-
-.messages{
-  flex:1;
-  overflow-y:auto;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  scroll-behavior:smooth;
-  background:#fff;
-}
-
-.message{
-  max-width:80%;
-  padding:12px 16px;
-  border-radius:12px;
-  line-height:1.5;
-  font-size:0.95em;
-  white-space:pre-wrap;
-  animation:fadeIn .25s ease-in;
-}
+.messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;background:#fff;}
+.message{max-width:80%;padding:12px 16px;border-radius:12px;line-height:1.5;font-size:.95em;white-space:pre-wrap;animation:fadeIn .25s ease-in;}
 .user{align-self:flex-end;background:#0078ff;color:#fff;}
 .ai{align-self:flex-start;background:#f1f1f1;border:1px solid #e3e3e3;color:#111;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .typing{display:inline-block;border-right:2px solid #0078ff;animation:blink .8s steps(2) infinite;}
 @keyframes blink{50%{border-color:transparent;}}
-
-.input-area{
-  display:flex;
-  gap:10px;
-  padding:15px;
-  border-top:1px solid #e3e3e3;
-  background:#fafafa;
-}
-input{
-  flex:1;
-  padding:12px 15px;
-  border:1px solid #ccc;
-  border-radius:10px;
-  font-size:16px;
-  outline:none;
-  transition:.2s;
-}
-input:focus{
-  border-color:#0078ff;
-  box-shadow:0 0 0 3px rgba(0,120,255,.15);
-}
-button.send{
-  padding:12px 18px;
-  background:#0078ff;
-  color:white;
-  border:none;
-  border-radius:10px;
-  font-weight:500;
-  cursor:pointer;
-  transition:.2s;
-}
+.input-area{display:flex;gap:10px;padding:15px;border-top:1px solid #e3e3e3;background:#fafafa;}
+input{flex:1;padding:12px 15px;border:1px solid #ccc;border-radius:10px;font-size:16px;outline:none;transition:.2s;}
+input:focus{border-color:#0078ff;box-shadow:0 0 0 3px rgba(0,120,255,.15);}
+button.send{padding:12px 18px;background:#0078ff;color:white;border:none;border-radius:10px;font-weight:500;cursor:pointer;transition:.2s;}
 button.send:hover{background:#005fcc;}
-
 /* ===== About Modal ===== */
-.about{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.4);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10;
-}
+.about{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:10;}
 .about.active{display:flex;}
-.about-box{
-  background:white;
-  color:#111;
-  border-radius:12px;
-  padding:25px;
-  max-width:300px;
-  text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-  animation:fadeIn .2s ease-in;
-}
+.about-box{background:white;color:#111;border-radius:12px;padding:25px;max-width:300px;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,0.2);animation:fadeIn .2s ease-in;}
 .about-box h2{margin-bottom:10px;color:#0078ff;}
-.about-box p{margin:4px 0;font-size:0.95em;}
-.about-box button{
-  margin-top:15px;
-  background:#0078ff;
-  color:white;
-  border:none;
-  border-radius:8px;
-  padding:8px 16px;
-  cursor:pointer;
-}
-
+.about-box p{margin:4px 0;font-size:.95em;}
+.about-box button{margin-top:15px;background:#0078ff;color:white;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;}
 /* ===== Responsive ===== */
-@media(max-width:700px){
-  .sidebar{position:fixed;left:-260px;z-index:20;height:100%;box-shadow:0 0 20px rgba(0,0,0,0.2);}
-  .sidebar.open{left:0;}
-}
+@media(max-width:700px){.sidebar{position:fixed;transform:translateX(-100%);height:100%;box-shadow:0 0 20px rgba(0,0,0,0.2);}.sidebar.open{transform:translateX(0);}}
 </style>
 </head>
 <body>
-  <!-- Sidebar -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <span>Ronzer G2</span>
-      <button id="closeSidebar">✖</button>
-    </div>
-    <div class="history-list" id="historyList"></div>
-    <button class="new-chat" id="newChat">+ New Chat</button>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span>Ronzer G2</span>
+    <button id="closeSidebar">✖</button>
   </div>
+  <div class="history-list" id="historyList"></div>
+  <button class="new-chat" id="newChat">+ New Chat</button>
+</div>
 
-  <!-- Main Chat Area -->
-  <div class="main">
-    <header>
-      <button id="menuBtn">☰</button>
-      <div>Chat</div>
-      <div class="btns">
-        <button id="aboutBtn">About</button>
-        <button id="clearChat">Clear</button>
-      </div>
-    </header>
-    <div class="messages" id="messages"></div>
-    <div class="input-area">
-      <input id="userInput" type="text" placeholder="Type your message..." />
-      <button class="send" id="sendBtn">Send</button>
+<div class="main">
+  <header>
+    <button id="menuBtn">☰</button>
+    <div>Chat</div>
+    <div class="btns">
+      <button id="aboutBtn">About</button>
+      <button id="clearChat">Clear</button>
     </div>
+  </header>
+  <div class="messages" id="messages"></div>
+  <div class="input-area">
+    <input id="userInput" type="text" placeholder="Type your message..." />
+    <button class="send" id="sendBtn">Send</button>
   </div>
+</div>
 
-  <!-- About Modal -->
-  <div class="about" id="about">
-    <div class="about-box">
-      <h2>Ronzer G2</h2>
-      <p>Created by <strong>RonzDavil</strong></p>
-      <p>Powered by <strong>Google Gemini</strong></p>
-      <button id="closeAbout">Close</button>
-    </div>
+<div class="about" id="about">
+  <div class="about-box">
+    <h2>Ronzer G2</h2>
+    <p>Created by <strong>RonzDavil</strong></p>
+    <p>Powered by <strong>Google Gemini</strong></p>
+    <button id="closeAbout">Close</button>
   </div>
+</div>
 
 <script type="module">
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
@@ -254,80 +106,41 @@ const newChatBtn=document.getElementById("newChat");
 let allChats=JSON.parse(localStorage.getItem("ronzer_all_chats"))||[];
 let activeChatIndex=0;
 if(allChats.length===0){allChats.push([]);}
-renderHistory(); renderChat();
+renderHistory();renderChat();
 
 function saveAll(){localStorage.setItem("ronzer_all_chats",JSON.stringify(allChats));renderHistory();}
-
 function renderHistory(){
   historyList.innerHTML="";
   allChats.forEach((chat,i)=>{
     const preview=chat[0]?chat[0].content.slice(0,20):"New Chat";
-    const div=document.createElement("div");
-    div.className="history-item";
-    div.textContent=preview||"Chat "+(i+1);
-    div.onclick=()=>{activeChatIndex=i;renderChat();};
-    historyList.appendChild(div);
+    const item=document.createElement("div");
+    item.className="history-item";
+    const title=document.createElement("div");
+    title.className="history-title";
+    title.textContent=preview||"Chat "+(i+1);
+    const del=document.createElement("button");
+    del.className="del-btn";del.textContent="🗑";
+    del.onclick=(e)=>{e.stopPropagation();allChats.splice(i,1);if(allChats.length===0)allChats.push([]);activeChatIndex=0;saveAll();renderChat();};
+    item.append(title,del);
+    item.onclick=()=>{activeChatIndex=i;renderChat();};
+    historyList.appendChild(item);
   });
 }
-
-function renderChat(){
-  messages.innerHTML="";
-  const conv=allChats[activeChatIndex];
-  conv.forEach(m=>addMessage(m.content,m.role==="user"?"user":"ai"));
-}
-
-function clearChat(){
-  allChats[activeChatIndex]=[];
-  saveAll(); renderChat();
-  addMessage("Chat cleared.","ai");
-}
-
-function newChat(){
-  allChats.unshift([]);
-  activeChatIndex=0;
-  saveAll(); renderChat();
-}
-
-function addMessage(text,sender,typing=false){
-  const msg=document.createElement("div");
-  msg.classList.add("message",sender);
-  msg.innerHTML=typing?`<span class='typing'></span>`:text;
-  messages.appendChild(msg);
-  messages.scrollTop=messages.scrollHeight;
-  return msg;
-}
-
-async function typeText(el,text){
-  const span=el.querySelector(".typing");
-  for(let i=0;i<text.length;i++){
-    span.textContent=text.slice(0,i+1);
-    await new Promise(r=>setTimeout(r,15));
-  }
-  span.style.border="none";
-}
-
-async function sendMessage(){
-  const userText=input.value.trim();
-  if(!userText)return;
-  addMessage(userText,"user");
-  input.value="";
-  const aiMsg=addMessage("", "ai", true);
-  const conv=allChats[activeChatIndex];
-  conv.push({role:"user",content:userText});
-  saveAll();
-  try{
-    const result=await model.generateContent({
-      contents:conv.map(m=>({role:m.role,parts:[{text:m.content}]}))
-    });
-    const response=result.response.text()||"No response.";
-    conv.push({role:"model",content:response});
-    saveAll();
-    await typeText(aiMsg,response);
-  }catch(err){aiMsg.innerHTML="❌ "+err.message;}
-}
-
+function renderChat(){messages.innerHTML="";const conv=allChats[activeChatIndex];conv.forEach(m=>addMessage(m.content,m.role==="user"?"user":"ai"));}
+function clearChat(){allChats[activeChatIndex]=[];saveAll();renderChat();addMessage("Chat cleared.","ai");}
+function newChat(){allChats.unshift([]);activeChatIndex=0;saveAll();renderChat();}
+function addMessage(text,sender,typing=false){const msg=document.createElement("div");msg.classList.add("message",sender);msg.innerHTML=typing?`<span class='typing'></span>`:text;messages.appendChild(msg);messages.scrollTop=messages.scrollHeight;return msg;}
+async function typeText(el,text){const span=el.querySelector(".typing");for(let i=0;i<text.length;i++){span.textContent=text.slice(0,i+1);await new Promise(r=>setTimeout(r,15));}span.style.border="none";}
+async function sendMessage(){const userText=input.value.trim();if(!userText)return;addMessage(userText,"user");input.value="";const aiMsg=addMessage("", "ai", true);const conv=allChats[activeChatIndex];conv.push({role:"user",content:userText});saveAll();try{const result=await model.generateContent({contents:conv.map(m=>({role:m.role,parts:[{text:m.content}]}))});const response=result.response.text()||"No response.";conv.push({role:"model",content:response});saveAll();await typeText(aiMsg,response);}catch(err){aiMsg.innerHTML="❌ "+err.message;}}
 sendBtn.onclick=sendMessage;
-input.addEventListener("keypress",e=>{if(e.key==="Enter")sendMessage();});
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();}
+});
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey&&e.shiftKey&&e.code==="KeyN"){e.preventDefault();newChat();}
+  if(e.ctrlKey&&e.shiftKey&&e.code==="KeyC"){e.preventDefault();clearChat();}
+  if(e.key==="Escape"){about.classList.remove("active");sidebar.classList.remove("open");}
+});
 clearBtn.onclick=clearChat;
 aboutBtn.onclick=()=>about.classList.add("active");
 closeAbout.onclick=()=>about.classList.remove("active");
