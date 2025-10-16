@@ -18,7 +18,7 @@
 
     .chat-container{
       width:95%;
-      max-width:800px;
+      max-width:900px;
       height:90vh;
       background:white;
       border-radius:16px;
@@ -52,10 +52,66 @@
       font-size:0.9em;
       transition:0.2s;
     }
-    header button:hover{
-      background:#e2e2e2;
-    }
+    header button:hover{background:#e2e2e2;}
 
+    /* ===== Carousel ===== */
+    .carousel {
+      position: relative;
+      width: 100%;
+      padding: 20px 0;
+      background: #fff;
+      overflow: hidden;
+      border-bottom: 1px solid #eee;
+    }
+    .carousel-track {
+      display: flex;
+      transition: transform 0.6s ease;
+      gap: 20px;
+      padding: 0 20px;
+    }
+    .carousel-card {
+      flex: 0 0 85%;
+      background: #fafafa;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    .carousel-card:hover { transform: translateY(-4px); }
+    .carousel-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .carousel-content {
+      padding: 15px;
+    }
+    .carousel-content h3 {
+      margin-bottom: 5px;
+      color: #111;
+      font-size: 1.1em;
+    }
+    .carousel-content p {
+      color: #555;
+      font-size: 0.9em;
+    }
+    .carousel-dots {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ccc;
+      margin: 0 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .dot.active { background: #0078ff; }
+
+    /* ===== Chat Section ===== */
     .messages{
       flex:1;
       overflow-y:auto;
@@ -86,10 +142,7 @@
       color:#111;
       border:1px solid #e3e3e3;
     }
-    @keyframes fadeIn{
-      from{opacity:0;transform:translateY(10px);}
-      to{opacity:1;transform:translateY(0);}
-    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
     .typing{
       display:inline-block;
@@ -128,9 +181,7 @@
       cursor:pointer;
       transition:0.2s;
     }
-    button.send:hover{
-      background:#005fcc;
-    }
+    button.send:hover{background:#005fcc;}
 
     /* About popup */
     .about{
@@ -164,8 +215,10 @@
       padding:8px 16px;
       cursor:pointer;
     }
+
     @media(max-width:600px){
       .chat-container{height:95vh;}
+      .carousel-card{flex:0 0 90%;}
       header{font-size:1em;}
     }
   </style>
@@ -179,6 +232,36 @@
         <button id="clearChat">Clear</button>
       </div>
     </header>
+
+    <!-- Carousel Section -->
+    <div class="carousel">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="carousel-card">
+          <img src="https://picsum.photos/800/300?random=1" alt="">
+          <div class="carousel-content">
+            <h3>Modern Design</h3>
+            <p>Elegant minimalism meets intelligence.</p>
+          </div>
+        </div>
+        <div class="carousel-card">
+          <img src="https://picsum.photos/800/300?random=2" alt="">
+          <div class="carousel-content">
+            <h3>Smart Memory</h3>
+            <p>Ronzer remembers your entire conversation.</p>
+          </div>
+        </div>
+        <div class="carousel-card">
+          <img src="https://picsum.photos/800/300?random=3" alt="">
+          <div class="carousel-content">
+            <h3>Powered by Gemini</h3>
+            <p>Driven by Google’s advanced AI model.</p>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+
+    <!-- Chat Area -->
     <div class="messages" id="messages"></div>
     <div class="input-area">
       <input id="userInput" type="text" placeholder="Type your message..." />
@@ -191,7 +274,7 @@
     <div class="about-box">
       <h2>Ronzer G2</h2>
       <p>Created by <strong>RonzDavil</strong></p>
-      <p>Powered by <strong>Google</strong></p>
+      <p>Powered by <strong>Google Gemini</strong></p>
       <button id="closeAbout">Close</button>
     </div>
   </div>
@@ -199,7 +282,7 @@
   <script type="module">
     import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
-    const API_KEY = "AIzaSyAvKTjnIOhBu58sa12hpnTdqTxmSUvAzls"; // 🔑 Replace with your Gemini API key
+    const API_KEY = "AIzaSyAvKTjnIOhBu58sa12hpnTdqTxmSUvAzls"; 
     const modelName = "gemini-2.0-flash";
     const model = new GoogleGenerativeAI(API_KEY).getGenerativeModel({ model: modelName });
 
@@ -214,15 +297,8 @@
     let conversation = JSON.parse(localStorage.getItem("ronzer_chat_memory")) || [];
     conversation.forEach(m=>addMessage(m.content,m.role==="user"?"user":"ai"));
 
-    function saveChat(){
-      localStorage.setItem("ronzer_chat_memory",JSON.stringify(conversation));
-    }
-    function clearChat(){
-      conversation=[];
-      localStorage.removeItem("ronzer_chat_memory");
-      messages.innerHTML="";
-      addMessage("Chat cleared.", "ai");
-    }
+    function saveChat(){localStorage.setItem("ronzer_chat_memory",JSON.stringify(conversation));}
+    function clearChat(){conversation=[];localStorage.removeItem("ronzer_chat_memory");messages.innerHTML="";addMessage("Chat cleared.","ai");}
 
     function addMessage(text,sender,typing=false){
       const msg=document.createElement("div");
@@ -250,21 +326,15 @@
       const aiMsg=addMessage("", "ai", true);
       conversation.push({role:"user",content:userText});
       saveChat();
-
       try{
         const result=await model.generateContent({
-          contents:conversation.map(m=>({
-            role:m.role,
-            parts:[{text:m.content}]
-          }))
+          contents:conversation.map(m=>({role:m.role,parts:[{text:m.content}]}))
         });
         const response=result.response.text()||"No response.";
         conversation.push({role:"model",content:response});
         saveChat();
         await typeText(aiMsg,response);
-      }catch(err){
-        aiMsg.innerHTML="❌ Error: "+err.message;
-      }
+      }catch(err){aiMsg.innerHTML="❌ Error: "+err.message;}
     }
 
     sendBtn.addEventListener("click",sendMessage);
@@ -273,6 +343,35 @@
     aboutBtn.addEventListener("click",()=>about.classList.add("active"));
     closeAbout.addEventListener("click",()=>about.classList.remove("active"));
     about.addEventListener("click",e=>{if(e.target===about)about.classList.remove("active");});
+
+    /* ===== Carousel Logic ===== */
+    const track=document.getElementById("carouselTrack");
+    const dotsContainer=document.getElementById("carouselDots");
+    const cards=document.querySelectorAll(".carousel-card");
+    let index=0;
+
+    cards.forEach((_,i)=>{
+      const dot=document.createElement("span");
+      dot.classList.add("dot");
+      if(i===0)dot.classList.add("active");
+      dot.addEventListener("click",()=>moveToSlide(i));
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots=[...dotsContainer.children];
+
+    function moveToSlide(i){
+      index=i;
+      const offset=-(i*(cards[0].offsetWidth+20));
+      track.style.transform=`translateX(${offset}px)`;
+      dots.forEach(d=>d.classList.remove("active"));
+      dots[i].classList.add("active");
+    }
+
+    setInterval(()=>{
+      index=(index+1)%cards.length;
+      moveToSlide(index);
+    },5000);
   </script>
 </body>
 </html>
