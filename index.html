@@ -1,168 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ronzer AI Chat</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background: #eef1f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .chat-container {
-      width: 95%;
-      max-width: 700px;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      height: 90vh;
-      overflow: hidden;
-    }
-    .header {
-      padding: 15px;
-      background: #0078ff;
-      color: white;
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      background: #f7f9fb;
-    }
-    .message {
-      margin-bottom: 12px;
-      padding: 12px 15px;
-      border-radius: 10px;
-      max-width: 80%;
-      line-height: 1.4;
-      white-space: pre-wrap;
-    }
-    .user { background: #0078ff; color: white; align-self: flex-end; }
-    .ai { background: #e5e5e5; color: #222; align-self: flex-start; }
-    .footer {
-      display: flex;
-      flex-direction: column;
-      padding: 15px;
-      border-top: 1px solid #ddd;
-      background: #fafafa;
-    }
-    textarea {
-      width: 100%;
-      resize: none;
-      padding: 10px;
-      font-size: 15px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      outline: none;
-      height: 70px;
-    }
-    .controls {
-      display: flex;
-      margin-top: 10px;
-      gap: 10px;
-    }
-    select, button {
-      flex: 1;
-      padding: 10px;
-      font-size: 15px;
-      border-radius: 10px;
-      border: none;
-    }
-    select { border: 1px solid #ccc; }
-    button {
-      background: #0078ff;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover { background: #005fcc; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ronzer AI (G2 & R2)</title>
+<style>
+  body{margin:0;background:#0d0d0f;color:#fff;font-family:"Inter",sans-serif;display:flex;flex-direction:column;height:100vh;}
+  header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;font-size:18px;font-weight:600;background:linear-gradient(90deg,#00ffff44,#00ff8844);color:#00ffc6;border-bottom:1px solid #00ffc620;}
+  select{background:#0f0f10;color:#00ffc6;border:1px solid #00ffc620;border-radius:8px;padding:6px 10px;font-size:14px;cursor:pointer;outline:none;}
+  #chat-container{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:15px;}
+  .message{max-width:80%;padding:12px 16px;border-radius:16px;line-height:1.4;animation:fadeIn .4s ease-in;}
+  .user{align-self:flex-end;background:#0078ff;border-bottom-right-radius:4px;}
+  .bot{align-self:flex-start;background:#1a1a1f;border:1px solid #00ffc650;border-bottom-left-radius:4px;box-shadow:0 0 10px #00ffc633;}
+  #input-area{display:flex;padding:10px;border-top:1px solid #222;background:#0f0f10;}
+  #input{flex:1;background:#18181b;border:1px solid #333;border-radius:12px;padding:10px 14px;color:#fff;font-size:15px;outline:none;}
+  #send{margin-left:10px;padding:10px 18px;background:linear-gradient(90deg,#00ffc6,#0078ff);border:none;border-radius:12px;color:#000;font-weight:bold;cursor:pointer;transition:all .2s;}
+  #send:hover{transform:scale(1.05);box-shadow:0 0 10px #00ffc6;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes blink{0%,100%{opacity:.2;}50%{opacity:1;}}
+  .typing{display:inline-block;width:4px;height:16px;background:#00ffc6;margin-left:3px;animation:blink 1s infinite;}
+</style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="header">🤖 Ronzer AI</div>
+<header>
+  🤖 Ronzer AI
+  <select id="modelSelect">
+    <option value="R2">R2 (Groq GPT-OSS)</option>
+    <option value="G2">G2 (Gemini-2.5-Flash)</option>
+  </select>
+</header>
 
-    <div class="messages" id="chat"></div>
+<div id="chat-container"></div>
+<div id="input-area">
+  <input id="input" placeholder="Type your message..." />
+  <button id="send">Send</button>
+</div>
 
-    <div class="footer">
-      <textarea id="prompt" placeholder="Type your message..."></textarea>
-      <div class="controls">
-        <select id="aiSelect">
-          <option value="google">Ronzer G2</option>
-          <option value="openai">Ronzer O2 (⚠️Unstable)</option>
-        </select>
-        <button id="sendBtn">Send</button>
-      </div>
-    </div>
-  </div>
+<script type="module">
+const chatContainer = document.getElementById('chat-container');
+const input = document.getElementById('input');
+const sendBtn = document.getElementById('send');
+const modelSelect = document.getElementById('modelSelect');
 
-  <script type="module">
-    import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-    import OpenAI from "https://esm.run/openai";
+const GROQ_API_KEY   = "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";   // 🧠 R2 key
+const GEMINI_API_KEY = "AIzaSyDA7DtBJlxx-kz3V4WVEkdCpccGEo1mQkA"; // ⚡ G2 key
 
-    // 🗝️ Your API keys here:
-    const GOOGLE_API_KEY = "AIzaSyAvKTjnIOhBu58sa12hpnTdqTxmSUvAzls";
-    const OPENAI_API_KEY = "Under Construction";
+sendBtn.onclick = sendMessage;
+input.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
 
-    const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
-    const openai = new OpenAI({ apiKey: OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+async function sendMessage() {
+  const msg = input.value.trim();
+  if (!msg) return;
+  appendMessage(msg,'user');
+  input.value="";
+  const botDiv=appendMessage('', 'bot', true);
+  const model=modelSelect.value;
+  model==="R2"?streamGroq(msg,botDiv):gemini(msg,botDiv);
+}
 
-    const chat = document.getElementById("chat");
-    const sendBtn = document.getElementById("sendBtn");
-    const promptInput = document.getElementById("prompt");
-    const aiSelect = document.getElementById("aiSelect");
+function appendMessage(text, sender, stream=false){
+  const div=document.createElement('div');
+  div.classList.add('message',sender);
+  div.innerHTML=text||'<span class="typing"></span>';
+  chatContainer.appendChild(div);
+  chatContainer.scrollTop=chatContainer.scrollHeight;
+  return div;
+}
 
-    // Add message to chat
-    function addMessage(text, sender) {
-      const div = document.createElement("div");
-      div.className = "message " + sender;
-      div.textContent = text;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    }
+/* ─── 🤖 R2 (Groq GPT-OSS-20B) ───────────────────────────── */
+async function streamGroq(userInput, botDiv){
+ try{
+   const res=await fetch("https://api.groq.com/openai/v1/chat/completions",{
+     method:"POST",
+     headers:{
+       "Content-Type":"application/json",
+       "Authorization":`Bearer ${GROQ_API_KEY}`
+     },
+     body:JSON.stringify({
+       model:"openai/gpt-oss-20b",
+       messages:[{role:"user",content:userInput}],
+       stream:true
+     })
+   });
+   if(!res.ok) throw new Error("HTTP "+res.status);
+   const reader=res.body.getReader();
+   const dec=new TextDecoder("utf-8");
+   let text="";
+   botDiv.innerHTML="";
+   while(true){
+     const {done,value}=await reader.read();
+     if(done) break;
+     const chunk=dec.decode(value);
+     const lines=chunk.split("\n").filter(l=>l.startsWith("data:"));
+     for(const line of lines){
+       const json=line.replace("data: ","");
+       if(json==="[DONE]") break;
+       try{
+         const parsed=JSON.parse(json);
+         const delta=parsed.choices?.[0]?.delta?.content||"";
+         text+=delta;botDiv.textContent=text;
+       }catch{}
+     }
+     chatContainer.scrollTop=chatContainer.scrollHeight;
+   }
+ }catch(e){botDiv.textContent="⚠️ R2 Error: "+e.message;}
+}
 
-    sendBtn.addEventListener("click", async () => {
-      const prompt = promptInput.value.trim();
-      const aiChoice = aiSelect.value;
-      if (!prompt) return;
-
-      addMessage(prompt, "user");
-      promptInput.value = "";
-
-      addMessage("⏳ Thinking...", "ai");
-
-      try {
-        let responseText = "";
-
-        if (aiChoice === "google") {
-          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-          const result = await model.generateContent(prompt);
-          responseText = result.response.text();
-        } else {
-          const response = await openai.responses.create({
-            model: "gpt-5",
-            input: prompt,
-          });
-          responseText = response.output_text;
-        }
-
-        // Replace "thinking..." message
-        chat.lastChild.textContent = responseText || "No response received.";
-      } catch (err) {
-        chat.lastChild.textContent = "❌ Error: " + err.message;
-      }
-    });
-  </script>
+/* ─── ⚡ G2 (Gemini-2.5-Flash) ───────────────────────────── */
+async function gemini(userInput, botDiv){
+ try{
+   const res=await fetch(
+     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+     {
+       method:"POST",
+       headers:{"Content-Type":"application/json"},
+       body:JSON.stringify({
+         contents:[{parts:[{text:userInput}]}]
+       })
+     }
+   );
+   const data=await res.json();
+   const text=data?.candidates?.[0]?.content?.parts?.[0]?.text || "⚠️ No response from Gemini.";
+   botDiv.textContent=text;
+ }catch(e){
+   botDiv.textContent="⚠️ G2 Error: "+e.message;
+ }
+}
+</script>
 </body>
 </html>
